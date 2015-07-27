@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+
+  "name": "Alt(ernative)-Tab(bing)",
+  "description": "This extension allows you to switch between Chrome tabs with the 'Alt-Tab' functionality",
+  "version": "1.0",
+
+  "background": {
+    "scripts" : ["background.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "js": ["jquery-2.1.4.min.js", "content.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+
+  "permissions": [
+    "tabs"
+  ]
+}
