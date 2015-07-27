@@ -14,7 +14,6 @@ $(window).on({
 			if (keysDown[18] && keysDown[81]) {
 				amountToTab += 1;
 			}
-
 		}
 	},
 	"keyup": function(e) {
