@@ -1,5 +1,3 @@
-console.log('content run');
-
 var keysDown = {
 	18: false, //	alt
 	81: false //	q
@@ -12,6 +10,12 @@ $(window).on({
 			keysDown[e.keyCode] = true;
 			console.log("what's down?", e.keyCode)
 			if (keysDown[18] && keysDown[81]) {
+				//	open dialog if it's not open
+				//	list current tabs, and the selected one
+				chrome.runtime.sendMessage({
+					"message": "return_tab_list"
+				});
+				
 				amountToTab += 1;
 			}
 		}
