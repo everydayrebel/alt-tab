@@ -20,7 +20,7 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 chrome.tabs.onActivated.addListener(function(activeInfo) {
 
   removeTabFromOrder(activeInfo.tabId);
-  tabOrder[activeInfo.windowId].unshift(activeInfo.tabId);
+  tabOrder.unshift(activeInfo.tabId);
 
   fancyConsole("Tab activated");
 
@@ -58,29 +58,34 @@ function removeTabFromOrder(removeId) {
 }
 
 function changeTab(amountToTab) {
-  amountToTab = amountToTab % tabOrder.length;
-
-  var orderedTabs = [],
-      unorderedTabs = [];
+  var orderedTabs = [];
 
   chrome.tabs.query({
     currentWindow: true
   }, function(tabs) {
-
-    tabs.forEach(function(tab){
-        tabOrder.forEach(function(orderedTabId, i) {
-          if(orderedTabId === tab.id) {
-            orderedTabs[i] = tab
-          }
-        })
+    for (var i = 0, l = tabOrder.length; i < l; i++) {
+      for (var j = 0, l2 = tabs.length; j < l2; j++) {
+        var curTab = tabs[j];
+        if (curTab.id === tabOrder[i]) {
+          orderedTabs.push(curTab);
+          tabs.splice(j, 1);
+          break;
+        }
       }
+    }
+
+    orderedTabs = orderedTabs.concat(tabs);
+
+    console.log("orderedTabs", orderedTabs.map(function(tab){
+      return tab.id;
+    }));
+
+    //  this will trigger the tab activate listener
+    chrome.tabs.update(orderedTabs[amountToTab % orderedTabs.length].id, {
+      active: true
     });
   });
 
-  //  this will trigger the tab activate listener
-  chrome.tabs.update(tabOrder[amountToTab], {
-    active: true
-  });
 };
 
 
