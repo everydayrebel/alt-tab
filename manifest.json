@@ -12,7 +12,8 @@
 
   "content_scripts": [
     {
-      "js": ["jquery-2.1.4.min.js", "content.js"],
+      "js": ["jquery-2.1.4.min.js", "jquery.simplemodal.1.4.4.min.js","content.js"],
+      "css": ["basic.css"],
       "matches": ["<all_urls>"]
     }
   ],
