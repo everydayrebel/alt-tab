@@ -1,14 +1,12 @@
 var tabOrder = [];
 
+console.log('background run');
+
 chrome.tabs.query({
   active: true
 }, function(tabs) {
   tabOrder = tabs;
 });
-
-function fancyConsole(message) {
-  console.log("%c" + message, "color: blue; font-style: italic");
-}
 
 
 //  TAB CLOSED
@@ -18,12 +16,8 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 
 //  TAB ACTIVATED
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-
   removeTabFromOrder(activeInfo.tabId);
   tabOrder.unshift(activeInfo.tabId);
-
-  fancyConsole("Tab activated");
-
 });
 
 
@@ -100,10 +94,6 @@ function returnOrderedTabs(callback) {
     }
 
     orderedTabs = orderedTabs.concat(tabs);
-
-    console.log("orderedTabs", orderedTabs.map(function(tab) {
-      return tab.id;
-    }));
 
     callback(orderedTabs);
   })
