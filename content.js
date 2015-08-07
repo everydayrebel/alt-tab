@@ -8,7 +8,6 @@ var keysDown = {
 	tabList = [];
 
 function resetPageState () {
-	console.log('reset fired')
 	keysDown = {
 		18: false, //	alt
 		81: false //	q
@@ -17,7 +16,6 @@ function resetPageState () {
 	tabDialogOpen = false;
 	tabList = [];
 	$.modal.close();
-	
 }
 
 chrome.runtime.onMessage.addListener(

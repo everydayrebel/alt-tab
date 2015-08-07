@@ -1,7 +1,5 @@
 var tabIdOrder = [];
 
-console.log('background run');
-
 chrome.tabs.query({
   active: true,
   currentWindow: true
@@ -9,9 +7,7 @@ chrome.tabs.query({
   tabIdOrder = tabs.map(function(tab) {
     return tab.id;
   });
-  console.log(tabIdOrder)
 });
-
 
 //  TAB CLOSED
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
@@ -20,24 +16,14 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 
 //  TAB ACTIVATED (FOCUS CHANGE)
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-  console.log('activated tab', activeInfo.tabId)
   sendResetMessage();
-  console.log('tab activated fire');
   removeTabFromOrder(activeInfo.tabId);
   tabIdOrder.unshift(activeInfo.tabId);
-
-
 });
 
 //  WINDOW FOCUS CHANGE
 chrome.windows.onFocusChanged.addListener(function () {
   sendResetMessage();
-
-  console.log(' activated fire');
-    // chrome.tabs.sendMessage(tabs[0].id, {
-    //     action: "reset_tab_state",
-    //     orderedTabs: orderedTabs
-    //   });
 })
 
 //  CONTENT SCRIPT LISTENERS
@@ -53,8 +39,6 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
-
-
 
 function removeTabFromOrder(removeId) {
   if (tabIdOrder.indexOf(removeId) > -1) {
@@ -106,9 +90,7 @@ function returnOrderedTabs(callback) {
         }
       }
     }
-
     orderedTabs = orderedTabs.concat(tabs);
-
     callback(orderedTabs);
   })
 };
