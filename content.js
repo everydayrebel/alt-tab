@@ -7,16 +7,28 @@ var keysDown = {
 	modalNode = "tabModalContainer",
 	tabList = [];
 
+function resetPageState () {
+	console.log('reset fired')
+	keysDown = {
+		18: false, //	alt
+		81: false //	q
+	};
+	amountToTab = 0;
+	tabDialogOpen = false;
+	tabList = [];
+	$.modal.close();
+	
+}
+
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		switch (request.action) {
 			case "show_tab_list":
 				tabList = request.orderedTabs;
 				renderTabList(request.orderedTabs);
-				// if (keysDown[18] && keysDown[81]) {
-				// 	tabList = request.orderedTabs;
-				// 	renderTabList();
-				// }
+				break;
+			case "reset_tab_state":
+				resetPageState();
 				break;
 		}
 	});
@@ -49,9 +61,7 @@ $(window).on({
 					"message": "change_tab",
 					"amountToTab": amountToTab
 				});
-				amountToTab = 0;
-				tabDialogOpen = false;
-				$.modal.close();
+				resetPageState();
 			}
 		}
 	}

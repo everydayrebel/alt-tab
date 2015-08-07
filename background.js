@@ -1,11 +1,15 @@
-var tabOrder = [];
+var tabIdOrder = [];
 
 console.log('background run');
 
 chrome.tabs.query({
-  active: true
+  active: true,
+  currentWindow: true
 }, function(tabs) {
-  tabOrder = tabs;
+  tabIdOrder = tabs.map(function(tab) {
+    return tab.id;
+  });
+  console.log(tabIdOrder)
 });
 
 
@@ -14,12 +18,27 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
   removeTabFromOrder(tabId, removeInfo.windowId);
 });
 
-//  TAB ACTIVATED
+//  TAB ACTIVATED (FOCUS CHANGE)
 chrome.tabs.onActivated.addListener(function(activeInfo) {
+  console.log('activated tab', activeInfo.tabId)
+  sendResetMessage();
+  console.log('tab activated fire');
   removeTabFromOrder(activeInfo.tabId);
-  tabOrder.unshift(activeInfo.tabId);
+  tabIdOrder.unshift(activeInfo.tabId);
+
+
 });
 
+//  WINDOW FOCUS CHANGE
+chrome.windows.onFocusChanged.addListener(function () {
+  sendResetMessage();
+
+  console.log(' activated fire');
+    // chrome.tabs.sendMessage(tabs[0].id, {
+    //     action: "reset_tab_state",
+    //     orderedTabs: orderedTabs
+    //   });
+})
 
 //  CONTENT SCRIPT LISTENERS
 chrome.runtime.onMessage.addListener(
@@ -38,19 +57,17 @@ chrome.runtime.onMessage.addListener(
 
 
 function removeTabFromOrder(removeId) {
-  if (tabOrder.indexOf(removeId) > -1) {
-    for (var i = 0, l = tabOrder.length; i < l; i++) {
-      var tabId = tabOrder[i];
+  if (tabIdOrder.indexOf(removeId) > -1) {
+    for (var i = 0, l = tabIdOrder.length; i < l; i++) {
+      var tabId = tabIdOrder[i];
 
       if (tabId === removeId) {
-        tabOrder.splice(i, 1);
+        tabIdOrder.splice(i, 1);
         break;
       }
     }
   }
 }
-
-
 
 function changeTab(amountToTab) {
   returnOrderedTabs(function(amountToTab, orderedTabs) {
@@ -59,8 +76,6 @@ function changeTab(amountToTab) {
     });
   }.bind(undefined, amountToTab));
 };
-
-
 
 function returnTabList() {
   returnOrderedTabs(function(orderedTabs) {
@@ -76,16 +91,15 @@ function returnTabList() {
   });
 };
 
-
 function returnOrderedTabs(callback) {
   chrome.tabs.query({
     currentWindow: true
   }, function(tabs) {
     var orderedTabs = [];
-    for (var i = 0, l = tabOrder.length; i < l; i++) {
+    for (var i = 0, l = tabIdOrder.length; i < l; i++) {
       for (var j = 0, l2 = tabs.length; j < l2; j++) {
         var curTab = tabs[j];
-        if (curTab.id === tabOrder[i]) {
+        if (curTab.id === tabIdOrder[i]) {
           orderedTabs.push(curTab);
           tabs.splice(j, 1);
           break;
@@ -97,4 +111,11 @@ function returnOrderedTabs(callback) {
 
     callback(orderedTabs);
   })
+};
+
+function sendResetMessage() {
+  console.log('reset sent', tabIdOrder[0]);
+  chrome.tabs.sendMessage(tabIdOrder[0], {
+      action: "reset_tab_state"
+    });
 };
